@@ -6,10 +6,31 @@ import BookingItem from "../_components/booking-item";
 import { db } from "../_lib/prisma";
 import BarbershopItem from "./_components/barbershop-item";
 import { Barbershop } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { Key } from "react";
 
 export default async function Home() {
   //Chamar prisma e pegar barbearias
-  const barbershops: [Barbershop] = await db.barbershop.findMany({});
+  const session = await getServerSession(authOptions);
+
+  const [barbershops, confirmedBookings] = await Promise.all([
+    db.barbershop.findMany({}),
+    session?.user
+      ? db.booking.findMany({
+          where: {
+            userId: (session.user as any).id,
+            date: {
+              gte: new Date(),
+            },
+          },
+          include: {
+            service: true,
+            barbershop: true,
+          },
+        })
+      : Promise.resolve([]),
+  ]);
 
   return (
     <div>
@@ -28,12 +49,16 @@ export default async function Home() {
         <Search />
       </div>
 
-      {/* <div className="px-5 mt-6">
-        <h2 className="text-xs mb-3 uppercase text-gray-400 font-bold">
+      <div className="mt-6">
+        <h2 className="px-5 text-xs uppercase text-gray-400 font-bold mb-3 ">
           Agendamentos
         </h2>
-        <BookingItem />
-      </div> */}
+        <div className="px-5 mt-6 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          {confirmedBookings.map((booking: { id: Key | null | undefined }) => (
+            <BookingItem key={booking.id} booking={booking} />
+          ))}
+        </div>
+      </div>
 
       <div className="mt-6">
         <h2 className="px-5 text-xs mb-3 uppercase text-gray-400 font-bold">
@@ -53,7 +78,7 @@ export default async function Home() {
         </h2>
 
         <div className="flex px-5 gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {barbershops.map((barbershop) => (
+          {barbershops.map((barbershop: { id: Key | null | undefined }) => (
             <BarbershopItem key={barbershop.id} barbershop={barbershop} />
           ))}
         </div>
