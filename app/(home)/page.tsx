@@ -7,8 +7,8 @@ import { db } from "../_lib/prisma";
 import BarbershopItem from "./_components/barbershop-item";
 import { Barbershop } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { Key } from "react";
+import { authOptions } from "../_lib/auth";
 
 export default async function Home() {
   //Chamar prisma e pegar barbearias
