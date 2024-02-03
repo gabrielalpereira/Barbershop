@@ -42,6 +42,7 @@ export default async function Home() {
             ? `Olá, ${session.user.name?.split(" ")[0]}!`
             : "Olá! Faça o login para agendar!"}
         </h2>
+
         <p className="capitalize text-sm">
           {format(new Date(), "EEEE',' dd 'de' MMMM", {
             locale: ptBR,
