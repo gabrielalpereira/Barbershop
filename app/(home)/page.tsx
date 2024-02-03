@@ -5,7 +5,6 @@ import Search from "./_components/search";
 import BookingItem from "../_components/booking-item";
 import { db } from "../_lib/prisma";
 import BarbershopItem from "./_components/barbershop-item";
-import { Barbershop } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { Key } from "react";
 import { authOptions } from "../_lib/auth";
@@ -77,8 +76,10 @@ export default async function Home() {
         </h2>
 
         <div className="flex px-5 gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {barbershops.map((barbershop: Barbershop) => (
-            <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+          {barbershops.map((barbershop: { id: Key | null | undefined }) => (
+            <div key={barbershop.id} className="min-w-[167px] max-w-[167px]">
+              <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+            </div>
           ))}
         </div>
       </div>
